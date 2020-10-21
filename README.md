@@ -1,4 +1,4 @@
-# urban-coding-challenge
+# eze server
 
 ## Table of Contents
 

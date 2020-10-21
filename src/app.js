@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import morgan from 'morgan';
+import requestRouter from './routes/requestRoutes';
 import { notFoundError, serverError } from './controllers/errorController';
 
 mongoose
@@ -31,9 +32,7 @@ app.use(mongoSanitize());
 app.use(compression());
 if (app.get('env') === 'development') app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
-  res.json('Welcome!');
-});
+app.use('/requests', requestRouter);
 
 app.use(notFoundError);
 app.use(serverError);
