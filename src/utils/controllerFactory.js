@@ -4,27 +4,30 @@ import { NotFoundError } from './errors';
 import catchAsync from './catchAsync';
 import APIExtension from './apiExtension';
 
-export function createOne(Model) {
+export function create(Model) {
   return catchAsync(async (req, res, next) => {
     const newDoc = await Model.create(req.body);
     const { collectionName } = Model.collection;
 
     res.status(201).json({
       status: 'success',
-      data: { [singular(collectionName)]: newDoc },
+      message: Array.isArray(newDoc)
+        ? `${newDoc.length} ${collectionName} created`
+        : undefined,
+      [singular(collectionName)]: !Array.isArray(newDoc) ? newDoc : undefined,
     });
   });
 }
 
 export function getAll(Model, customCollectionName) {
   return catchAsync(async (req, res, next) => {
-    const docs = await new APIExtension(Model.find(), req.query).query;
+    const docs = await new APIExtension(Model, req.query).query;
     const { collectionName } = Model.collection;
 
     res.status(200).json({
       status: 'success',
       results: docs.length,
-      data: { [customCollectionName || collectionName]: docs },
+      [customCollectionName || collectionName]: docs,
     });
   });
 }
@@ -35,7 +38,7 @@ export function getAllUnique(Model, customCollectionName, identifier) {
 
     res.status(200).json({
       status: 'success',
-      data: { [customCollectionName]: docs.length },
+      [customCollectionName]: docs.length,
     });
   });
 }
@@ -52,7 +55,7 @@ export function getOne(Model, populateOptions) {
 
     res.status(200).json({
       status: 'success',
-      data: { [singular(collectionName)]: doc },
+      [singular(collectionName)]: doc,
     });
   });
 }
@@ -69,7 +72,7 @@ export function updateOne(Model) {
 
     res.status(200).json({
       status: 'success',
-      data: { [singular(collectionName)]: doc },
+      [singular(collectionName)]: doc,
     });
   });
 }

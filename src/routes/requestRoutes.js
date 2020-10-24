@@ -4,7 +4,7 @@ import setQuery from '../middleware/setQuery';
 
 const router = Router();
 
-router.route('/').get(requestController.getAll);
+router.route('/').get(requestController.getAll).post(requestController.create);
 router
   .route('/buy')
   .get(setQuery({ requestType: 'buy' }), requestController.getAll);
