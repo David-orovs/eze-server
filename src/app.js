@@ -31,17 +31,19 @@ app.use(helmet());
 app.use(xss());
 app.use(mongoSanitize());
 app.use(compression());
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '../public')));
 if (app.get('env') === 'development') app.use(morgan('dev'));
 
 app.use('/api/requests', requestRouter);
 
-if (process.env.NODE_ENV === 'production') {
-  app.all('*', (req, res, next) => {
-    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
-  });
-} else {
-  app.use(notFoundError);
-}
+// if (process.env.NODE_ENV === 'production') {
+app.all('*', (req, res, next) => {
+  res.sendFile('index.html');
+});
+// } else {
+//   app.use(notFoundError);
+// }
 
 app.use(serverError);
 
