@@ -61,13 +61,20 @@ Your app is ready to be deployed!
 
 Runs the app in the production mode.
 
-<br>
-
-> **NB:** _This app and all required services (e.g MongoDB) have been containerised with Docker. If you have docker installed, run `docker-compose up` to start the server._
-
-<br>
-
 ## API Spec
+
+### Request
+
+```javascript
+{
+  name: 'iPhone XS Max',
+  storageSize: '64GB',
+  grade: 'New',
+  price: 560,
+  unlocked: true,
+  requestType: 'buy',
+}
+```
 
 ## Usage <a name = "usage"></a>
 
@@ -80,6 +87,12 @@ Send HTTP requests to the following endpoints.
 | `GET /requests/sell` | Gets all sell requests |
 
 <br>
+
+### Text Search
+
+You can search for text by passing the `q` query parameter to any GET endpoint. This performs a full-text search on the database and returns the results ordered by relevance.
+
+e.g `GET /requests?q=a1,xs,128gb`
 
 ### Pagination
 
