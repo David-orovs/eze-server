@@ -21,5 +21,6 @@ const requestSchema = new mongoose.Schema(
 requestSchema.index({ name: 'text', grade: 'text', storageSize: 'text' });
 
 const Request = mongoose.model('Request', requestSchema);
+Request.ensureIndexes();
 
 export default Request;

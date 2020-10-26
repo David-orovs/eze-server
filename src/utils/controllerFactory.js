@@ -1,4 +1,4 @@
-import { singular } from 'pluralize';
+import { singular, plural } from 'pluralize';
 
 import { NotFoundError } from './errors';
 import catchAsync from './catchAsync';
@@ -21,24 +21,29 @@ export function create(Model) {
 
 export function getAll(Model, customCollectionName) {
   return catchAsync(async (req, res, next) => {
-    const docs = await new APIExtension(Model, req.query).query;
+    const api = new APIExtension(Model, req.query);
     const { collectionName } = Model.collection;
+    const [docs, totalCount] = await Promise.all([
+      api.query,
+      Model.find(...api.filterOptions).count(),
+    ]);
 
     res.status(200).json({
       status: 'success',
-      results: docs.length,
+      totalCount,
       [customCollectionName || collectionName]: docs,
     });
   });
 }
 
-export function getAllUnique(Model, customCollectionName, identifier) {
-  return catchAsync(async (_req, res, _next) => {
-    const docs = await Model.find().distinct(identifier);
+export function getAllUnique(Model, identifier, customPropertyName) {
+  return catchAsync(async (req, res, _next) => {
+    const api = new APIExtension(Model, req.query);
+    const docs = await Model.find(...api.filterOptions).distinct(identifier);
 
     res.status(200).json({
       status: 'success',
-      [customCollectionName]: docs.length,
+      [customPropertyName || plural(identifier)]: docs,
     });
   });
 }

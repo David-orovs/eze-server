@@ -12,4 +12,7 @@ router
   .route('/sell')
   .get(setQuery({ requestType: 'sell' }), requestController.getAll);
 
+router.route('/sizes').get(requestController.getAllStorageSizes);
+router.route('/prices/minmax').get(requestController.getMinMaxPrices);
+
 export default router;

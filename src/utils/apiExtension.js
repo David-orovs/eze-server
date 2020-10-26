@@ -4,8 +4,9 @@ class APIExtension {
   constructor(query, queryObject) {
     this.query = query;
     this.queryObject = queryObject;
+    this.filterOptions = [];
 
-    this.filter().sort().paginate();
+    this.filter().sort().limitFields().paginate();
   }
 
   filter() {
@@ -18,8 +19,8 @@ class APIExtension {
     const search = {};
     if (queryObj.q) {
       search.$text = { $search: queryObj.q };
-      delete queryObj.q;
     }
+    delete queryObj.q;
 
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(
@@ -27,7 +28,12 @@ class APIExtension {
       (match) => `$${match}`
     );
 
-    this.query = this.query.find({ ...JSON.parse(queryStr), ...search });
+    this.filterOptions.push(
+      { ...JSON.parse(queryStr), ...search },
+      { score: { $meta: 'textScore' } }
+    );
+
+    this.query = this.query.find(...this.filterOptions);
 
     return this;
   }
@@ -37,7 +43,16 @@ class APIExtension {
       const sortBy = this.queryObject.sort.replace(/,/g, ' ');
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort('-createdAt');
+      this.query = this.query.sort({ score: { $meta: 'textScore' } });
+    }
+
+    return this;
+  }
+
+  limitFields() {
+    if (this.queryObject.fields) {
+      const fields = this.queryObject.fields.replace(/,/g, ' ');
+      this.query = this.query.select(fields);
     }
 
     return this;
