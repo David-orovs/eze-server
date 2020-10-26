@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -32,9 +33,16 @@ app.use(mongoSanitize());
 app.use(compression());
 if (app.get('env') === 'development') app.use(morgan('dev'));
 
-app.use('/requests', requestRouter);
+app.use('/api/requests', requestRouter);
 
-app.use(notFoundError);
+if (process.env.NODE_ENV === 'production') {
+  app.all('*', (req, res, next) => {
+    res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
+  });
+} else {
+  app.use(notFoundError);
+}
+
 app.use(serverError);
 
 export default app;
